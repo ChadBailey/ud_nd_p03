@@ -1,0 +1,11 @@
+level_1:
+  1_challenge: A __1__ is created with the def keyword. You specify the inputs a
+    __1__ takes by adding __2__ separated by commas between the parentheses. __1__s
+    by default return __3__ if you don't specify the value to return. __2__ can
+    be standard data types such as string, number, dictionary, tuple, and __4__
+    or can be more complicated such as objects and lambda functions.
+  2_answers:
+    '1': function
+    '2': variables
+    '3': nothing
+    '4': set

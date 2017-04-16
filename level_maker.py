@@ -17,6 +17,7 @@ number_of_levels = 0
 valid = False
 levels_file = False
 levels_dict = {}
+levels_dict['settings'] = {}
 
 # Get number of levels to generate from the user
 while not valid:
@@ -66,6 +67,15 @@ while not valid:
 		# This could be assumed, but putting it here makes it more obvious
 		continue
 
+
+
+reply = raw_input("Do you want to encode this file to prevent casual cheating? (Y/n)")
+if reply == "" or reply.lower() == "yes" or reply.lower() == "y":
+	enable_encoding = True
+	levels_dict['settings']['encoding'] = True
+else:
+	enable_encoding = False
+	levels_dict['settings']['encoding'] = False
 
 #clear screen
 
@@ -122,4 +132,4 @@ for current_level in range(1,number_of_levels + 1):
 # lacking things like curly braces (eww)
 yaml.dump(levels_dict,levels_file,default_flow_style=False)
 
-wait_for_input = raw_input("Press any key to continue")
+wait_for_input = raw_input("%s.yml generated successfully, press any key to continue" % levels_filename)
