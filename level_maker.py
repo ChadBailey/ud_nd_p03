@@ -21,6 +21,7 @@ levels_dict = {}
 # Get number of levels to generate from the user
 while not valid:
 
+	# caution to those who strongly type: falsy operator
 	if not levels_file:
 
 		levels_filename = raw_input("Please enter the name of this levels file\n")
