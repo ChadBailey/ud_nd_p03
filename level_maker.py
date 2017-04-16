@@ -106,6 +106,7 @@ for current_level in range(1,number_of_levels + 1):
 				solution = re.sub("__{1}(" + replacements_list[current_blank] + "){1}__{1}",blank_answer,solution)
 
 				# Add answer to levels dictionary
+				levels_dict["level_" + str(current_level)]['2_answers'][replacements_list[current_blank]] = blank_answer
 
 			print "Solution stored as:\n%s\n\n" % solution
 
