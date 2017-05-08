@@ -100,11 +100,11 @@ def main():
 			# only first letter stored, valid options are "e", "m", "h", and "c"
 			settings['difficulty'] = user_input.lower()[0]
 			if settings['difficulty'] == 'c':
-				user_input = raw_input("Custom mode selected, how many lives do you want to have? [enter number, or type cancel to re-select game difficulty]\n")
+				user_input = raw_input("Custom mode selected, how many lives do you want to have? (enter number, or type [c]ancel to re-select game difficulty)\n")
 				try:
 					user_input = int(user_input)
 					settings['lives'] = user_input
-				except TypeError:
+				except ValueError:
 					continue
 
 			elif settings['difficulty'] == 'e': settings['lives'] = 10
