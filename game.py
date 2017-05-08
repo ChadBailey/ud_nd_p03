@@ -52,3 +52,67 @@
 # Make ascii graphic to represent tries/lives like hangman
 # Make cool ascii ending congratulations
 
+import yaml
+import os
+
+# Placeholder for now, will do something more interesting eventually
+def level_validator(filename):
+	if os.path.isfile(filename):
+		return True
+	else:
+		return False
+
+# load_level returns true on success, false on failure
+def load_level(filename):
+	if level_validator(filename):
+		# otherwise, try and open the file for writing
+		try:
+			levels_file = open(filename, "r")
+		except IOError:
+			return False
+
+		levels_dict = yaml.load(levels_file)
+		return True
+
+	else:
+		return False
+
+
+def main():
+
+	settings = {}
+
+	#Level select
+	while True:
+		user_input = raw_input("Please enter the game name you would like to use.\n")
+		# Returns True on success
+		if not load_level(user_input + ".yml"):
+			print "Error loading level, please try again."
+		else:
+			print "Successfully loaded level %s" % user_input
+			break
+
+	#Level select
+	while True:
+		user_input = raw_input("Please select your difficulty. ([e]asy, [m]edium, [h]ard, [c]ustom)\n")
+
+		if user_input.lower() in ['easy','e','medium','m','hard','h','custom','c']:
+			# only first letter stored, valid options are "e", "m", "h", and "c"
+			settings['difficulty'] = user_input.lower()[0]
+			if settings['difficulty'] == 'c':
+				user_input = raw_input("Custom mode selected, how many lives do you want to have? [enter number, or type cancel to re-select game difficulty]\n")
+				try:
+					user_input = int(user_input)
+					settings['lives'] = user_input
+				except TypeError:
+					continue
+
+			elif settings['difficulty'] == 'e': settings['lives'] = 10
+			elif settings['difficulty'] == 'm': settings['lives'] = 5
+			elif settings['difficulty'] == 'h': settings['lives'] = 3
+
+			print 'Difficulty set! You will have %s lives. Lets get started!' % str(settings['lives'])
+			break
+
+main()
+

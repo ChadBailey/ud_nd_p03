@@ -4,11 +4,18 @@
 #
 # Purpose: Udacity intro to Programming Nanodegree, 3rd project
 #
-# Objective: Make a "fill in the blanks" game
+# Objective: This is a simple level maker utility to create levels to be used by the application.
+#
+# Notice: This level maker is a complete bonus and not a requirement of the project. Therefore 
+# certain criteria have not been met. For example, I have not abstracted
+# out anything into functions. While I normally do this for everything I design, this particular
+# application I did not feel it made sense to do so due to the way it flowed.
+
 
 import os
 import yaml
 import re
+import base64
 
 #Initializing variables
 number_of_levels = 0
@@ -68,7 +75,7 @@ while not valid:
 		continue
 
 
-
+# Note: I fully understand that encoding into and out of base64 is not a proper security measure
 reply = raw_input("Do you want to encode this file to prevent casual cheating? (Y/n)")
 if reply == "" or reply.lower() == "yes" or reply.lower() == "y":
 	enable_encoding = True
@@ -105,7 +112,7 @@ for current_level in range(1,number_of_levels + 1):
 			levels_dict["level_" + str(current_level)]['2_answers'] = {}
 
 			# Add sentence to levels dictionary as key '1_challenge'
-			levels_dict["level_" + str(current_level)]['1_challenge'] = level_sentence
+			levels_dict["level_" + str(current_level)]['1_challenge'] = level_sentence if not enable_encoding else base64.b64encode(level_sentence)
 
 			for current_blank in range(0,number_of_blanks):
 
@@ -117,7 +124,7 @@ for current_level in range(1,number_of_levels + 1):
 				solution = re.sub("__{1}(" + replacements_list[current_blank] + "){1}__{1}",blank_answer,solution)
 
 				# Add answer to levels dictionary
-				levels_dict["level_" + str(current_level)]['2_answers'][replacements_list[current_blank]] = blank_answer
+				levels_dict["level_" + str(current_level)]['2_answers'][replacements_list[current_blank]] = blank_answer if not enable_encoding else base64.b64encode(blank_answer)
 
 			print "Solution stored as:\n%s\n\n" % solution
 
