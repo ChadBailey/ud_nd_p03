@@ -72,27 +72,33 @@ def load_level(filename):
 			return False
 
 		levels_dict = yaml.load(levels_file)
+		if levels_dict['settings']['encoding']:
+			
 		return True
 
 	else:
 		return False
 
-
-def main():
-
-	settings = {}
-
+# Allows user to select a level
+# Takes settings dictionary from main function
+# Since dictionary is mutable, nothing is returned back, the dictionary is simply updated
+def level_select(settings):
 	#Level select
 	while True:
-		user_input = raw_input("Please enter the game name you would like to use.\n")
-		# Returns True on success
+		user_input = raw_input('Please enter the name of the levels file you would like to use.\nHint: Just hit enter to load the default level\n')
+
+		#Sets default level if none is chosen
+		if user_input = '': user_input = 'udacity_example'
+
+		# Attempts to load the requested level, returns True on success
 		if not load_level(user_input + ".yml"):
 			print "Error loading level, please try again."
 		else:
 			print "Successfully loaded level %s" % user_input
 			break
 
-	#Level select
+# Allows user to select a difficulty)
+def difficulty_select(settings):
 	while True:
 		user_input = raw_input("Please select your difficulty. ([e]asy, [m]edium, [h]ard, [c]ustom)\n")
 
@@ -113,6 +119,24 @@ def main():
 
 			print 'Difficulty set! You will have %s lives. Lets get started!' % str(settings['lives'])
 			break
+
+def play_level(settings,level)
+	
+
+def main():
+
+	os.system('cls') #clear the screen
+
+	#Initialize and populate settings dictionary
+	settings = {}
+	level_select(settings)
+
+	#clear the screen
+	os.system('cls')
+	difficulty_select(settings)
+
+
+
 
 main()
 
