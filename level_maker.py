@@ -65,7 +65,7 @@ while not valid:
 	print "You entered %s levels" % number_of_levels
 	
 
-	reply = raw_input("Is this correct? (Y/n)")
+	reply = raw_input("Is this correct? ([Y]/n)")
 
 	# test lower-cased version of response to enforce case insensitivity
 	if reply == "" or reply.lower() == "yes" or reply.lower() == "y":

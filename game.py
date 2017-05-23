@@ -63,7 +63,7 @@ def level_validator(filename):
 		return False
 
 # load_level returns true on success, false on failure
-def load_level(filename):
+def load_level(levels_dict,filename):
 	if level_validator(filename):
 		# otherwise, try and open the file for writing
 		try:
@@ -72,9 +72,11 @@ def load_level(filename):
 			return False
 
 		levels_dict = yaml.load(levels_file)
-		if levels_dict['settings']['encoding']:
-			
-		return True
+#		if levels_dict['settings']['encoding']:
+
+#		print levels_dict
+
+		return levels_dict
 
 	else:
 		return False
@@ -82,20 +84,21 @@ def load_level(filename):
 # Allows user to select a level
 # Takes settings dictionary from main function
 # Since dictionary is mutable, nothing is returned back, the dictionary is simply updated
-def level_select(settings):
+def level_select(levels_dict):
 	#Level select
 	while True:
 		user_input = raw_input('Please enter the name of the levels file you would like to use.\nHint: Just hit enter to load the default level\n')
 
 		#Sets default level if none is chosen
-		if user_input = '': user_input = 'udacity_example'
+		if user_input == '': user_input = 'udacity_example'
 
 		# Attempts to load the requested level, returns True on success
-		if not load_level(user_input + ".yml"):
+		levels_dict = load_level(levels_dict,user_input + ".yml")
+		if not levels_dict:
 			print "Error loading level, please try again."
 		else:
 			print "Successfully loaded level %s" % user_input
-			break
+			return levels_dict
 
 # Allows user to select a difficulty)
 def difficulty_select(settings):
@@ -120,7 +123,8 @@ def difficulty_select(settings):
 			print 'Difficulty set! You will have %s lives. Lets get started!' % str(settings['lives'])
 			break
 
-def play_level(settings,level)
+def play_level(settings,level):
+	pass
 	
 
 def main():
@@ -129,14 +133,14 @@ def main():
 
 	#Initialize and populate settings dictionary
 	settings = {}
-	level_select(settings)
+	levels_dict = {}
+
+	levels_dict = level_select(levels_dict)
 
 	#clear the screen
-	os.system('cls')
 	difficulty_select(settings)
 
-
-
+	for each 
 
 main()
 
