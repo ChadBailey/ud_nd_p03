@@ -1,0 +1,20 @@
+level_1:
+  1_challenge: X19fMV9fXyBpcyBhIF9fXzJfX18=
+  2_answers:
+    '1': dGhpcw==
+    '2': dGVzdA==
+level_2:
+  1_challenge: X19fMV9fXyBpcyBfX18yX19fIGEgX19fM19fXyE=
+  2_answers:
+    '1': dGhpcw==
+    '2': YWxzbw==
+    '3': dGVzdA==
+level_3:
+  1_challenge: X19fMV9fXyBjb21wbGV0ZSEgX19fMl9fXyBtYXkgbm93IF9fXzNfX18gdGhlIGdhbWUh
+  2_answers:
+    '1': dGVzdA==
+    '2': eW91
+    '3': ZmluaXNo
+settings:
+  encoding: true
+  version: 1

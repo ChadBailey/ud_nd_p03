@@ -99,7 +99,7 @@ for current_level in range(1,number_of_levels + 1):
 		level_sentence = raw_input("Please enter the challenge sentence for level %s:\n" % current_level)
 		#this will be the solution once the user 
 		solution = level_sentence
-		replacements_list = list(set(re.findall("__{1}(\d+){1}__{1}",level_sentence)))
+		replacements_list = list(set(re.findall("_{3}(\d+){1}_{3}",level_sentence)))
 		number_of_blanks = len(replacements_list)
 
 		if number_of_blanks > 0:
@@ -117,11 +117,11 @@ for current_level in range(1,number_of_levels + 1):
 			for current_blank in range(0,number_of_blanks):
 
 
-				blank_answer = raw_input("Please enter the answer for: __%s__\n" % replacements_list[current_blank])
+				blank_answer = raw_input("Please enter the answer for: ___%s___\n" % replacements_list[current_blank])
 
 				# The solution isn't actually needed for anything, but is tracked so that it can be played back to the end user
 				# to ensure that the solution says what they ended it to.
-				solution = re.sub("__{1}(" + replacements_list[current_blank] + "){1}__{1}",blank_answer,solution)
+				solution = re.sub("_{3}(" + replacements_list[current_blank] + "){1}_{3}",blank_answer,solution)
 
 				# Add answer to levels dictionary
 				levels_dict["level_" + str(current_level)]['2_answers'][replacements_list[current_blank]] = blank_answer if not enable_encoding else base64.b64encode(blank_answer)
@@ -130,7 +130,7 @@ for current_level in range(1,number_of_levels + 1):
 
 			valid = True
 		else:
-			print "Error, please enter a string containing replacements in the format __(number)__."
+			print "Error, please enter a string containing replacements in the format ___(number)___."
 			continue
 
 

@@ -1,3 +1,5 @@
+#
+
 # game.py made by Chad Bailey 4-15-2017
 #
 # Purpose: Udacity intro to Programming Nanodegree, 3rd project
@@ -54,13 +56,29 @@
 
 import yaml
 import os
+import base64
 
-# Placeholder for now, will do something more interesting eventually
+# Returns true if valid, false if invalid
+# Also prints out helpful text if a level was loaded, but not of the correct version - then returns false
 def level_validator(filename):
 	if os.path.isfile(filename):
-		return True
-	else:
-		return False
+		try:
+			try:
+				levels_file = open(filename, "r")
+			except IOError:
+				return False
+			levels_dict = yaml.load(levels_file)
+			try:
+				if levels_dict['settings']['version'] == 1: return True
+			except KeyError: pass
+			print 'Found levels file, but it is not the correct version. Please try another file.'
+			x = raw_input('Press [enter] to continue')
+			os.system('cls')
+			return False
+
+		except IOError:
+			return False
+	return False
 
 # load_level returns true on success, false on failure
 def load_level(levels_dict,filename):
@@ -97,6 +115,7 @@ def level_select(levels_dict):
 		if not levels_dict:
 			print "Error loading level, please try again."
 		else:
+			os.system('cls')
 			print "Successfully loaded level %s" % user_input
 			return levels_dict
 
@@ -120,11 +139,28 @@ def difficulty_select(settings):
 			elif settings['difficulty'] == 'm': settings['lives'] = 5
 			elif settings['difficulty'] == 'h': settings['lives'] = 3
 
+			os.system('cls')
 			print 'Difficulty set! You will have %s lives. Lets get started!' % str(settings['lives'])
 			break
 
 def play_level(settings,level):
-	pass
+	print settings
+	print 'Challenge: %s' % level['1_challenge']
+	print 'Answers: %s' % level['2_answers']
+	print 'Lives Left: %s' % str(settings['lives'])
+	user_input = raw_input("'[S]ave a life, [L]ose a life, [W]in?'\n")
+	user_input = user_input.lower()
+	if user_input != 's' and user_input != 'w':
+		os.system('cls')
+		print 'Life depleting.....'
+		settings['lives'] -= 1
+		return
+	elif user_input == 'w':
+		settings['winner'] = True
+		return
+	else:
+		print 'Save successful!'
+		return
 	
 
 def main():
@@ -133,14 +169,31 @@ def main():
 
 	#Initialize and populate settings dictionary
 	settings = {}
+	settings['winner'] = False # Will be set to True to indicate they have won!
+	settings['win_level'] = False
 	levels_dict = {}
+
+	difficulty_select(settings)
 
 	levels_dict = level_select(levels_dict)
 
-	#clear the screen
-	difficulty_select(settings)
+	settings['encoded'] = levels_dict['settings']['encoding']
 
-	for each 
+	while settings['lives'] >= 0:
 
-main()
+		for key in levels_dict:
+			if "level_" in key:
+				play_level(settings,levels_dict[key])
+
+		if settings['winner']:
+			os.system('cls')
+			print '\n\n\nCongratulations!!! You are the Winrar! You win One FREE INTERNET!\n\n\n'
+			break
+
+	if not settings['winner']:
+		os.system('cls')
+		print '\n\n\nSomething very unfortunate has happened... better luck next time :(\n\n\n'
+
+if __name__ == '__main__':
+	main()
 
