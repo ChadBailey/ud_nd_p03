@@ -162,7 +162,7 @@ def play_game(settings,levels_dict):
 				return
 	elif result == 'close':
 		raw_input("You're really close! Try again!\npress [enter] to continue")
-		if not settings['close_forgiveness']: settings['lives'] -= 1
+		if not settings['close_forgiveness']: settings['lives'] -= 1 #Only reduce lives on a close guess if close_forgiveness is set
 	else:
 		raw_input('Not quite, Try again...\npress [enter] to continue')
 		settings['lives'] -= 1
@@ -181,11 +181,11 @@ def main():
 		if settings['winner']:
 			os.system('cls')
 			play_again = raw_input('\n\n\nCongratulations!!! You are the Winrar! You win One FREE INTERNET!\n\n\nWould you like to play again? (y/n)\n').lower()
-			if play_again == 'y': main()
 			break
 	if not settings['winner']:
 		os.system('cls')
-		print '\n\n\nYou did your best... better luck next time :(\n\n\n'
+		play_again = raw_input('\n\n\nYou did your best... better luck next time :(\n\n\n Would you like to play again? (y/n)\n').lower()
+	if play_again == 'y': main()
 
 if __name__ == '__main__': #Trigger main function if the game is not imported
 	main()
