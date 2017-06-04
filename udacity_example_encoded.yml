@@ -1,0 +1,11 @@
+levels:
+  1:
+    answers:
+      '1': ZnVuY3Rpb24=
+      '2': dmFyaWFibGVz
+      '3': bm90aGluZw==
+      '4': c2V0
+    challenge: QSBfX18xX19fIGlzIGNyZWF0ZWQgd2l0aCB0aGUgZGVmIGtleXdvcmQuIFlvdSBzcGVjaWZ5IHRoZSBpbnB1dHMgYSBfX18xX19fIHRha2VzIGJ5IGFkZGluZyBfX18yX19fIHNlcGFyYXRlZCBieSBjb21tYXMgYmV0d2VlbiB0aGUgcGFyZW50aGVzZXMuIF9fXzFfX19zIGJ5IGRlZmF1bHQgcmV0dXJuIF9fXzNfX18gaWYgeW91IGRvbid0IHNwZWNpZnkgdGhlIHZhbHVlIHRvIHJldHVybi4gX19fMl9fXyBjYW4gYmUgc3RhbmRhcmQgZGF0YSB0eXBlcyBzdWNoIGFzIHN0cmluZywgbnVtYmVyLCBkaWN0aW9uYXJ5LCB0dXBsZSwgYW5kIF9fXzRfX18gb3IgY2FuIGJlIG1vcmUgY29tcGxpY2F0ZWQgc3VjaCBhcyBvYmplY3RzIGFuZCBsYW1iZGEgZnVuY3Rpb25zLg==
+settings:
+  encoding: true
+  version: 1

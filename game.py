@@ -180,11 +180,11 @@ def main():
 		play_game(settings,levels_dict)
 		if settings['winner']:
 			os.system('cls')
-			play_again = raw_input('\n\n\nCongratulations!!! You are the Winrar! You win One FREE INTERNET!\n\n\nWould you like to play again? (y/n)\n').lower()
+			play_again = raw_input('\n\n\nCongratulations!!! You are the Winrar! You win One FREE INTERNET!\n\n\nWould you like to play again? (y/[n])\n').lower()
 			break
 	if not settings['winner']:
 		os.system('cls')
-		play_again = raw_input('\n\n\nYou did your best... better luck next time :(\n\n\n Would you like to play again? (y/n)\n').lower()
+		play_again = raw_input('\n\n\nYou did your best... better luck next time :(\n\n\nWould you like to play again? (y/[n])\n').lower()
 	if play_again == 'y': main()
 
 if __name__ == '__main__': #Trigger main function if the game is not imported
