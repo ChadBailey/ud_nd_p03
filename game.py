@@ -57,7 +57,8 @@ import base64
 import re
 from difflib import SequenceMatcher as SeqMat
 
-#All default settings go here
+#All default settings go here, this is called at the beginning of main(). Returns dictionary with initialized settings filled in
+#This is where you go to set the configurable parts of the game as the game owner
 def load_defaults(settings_dict):
 	settings_dict['game_version'] 		= 1 		#Version of the game - used to validate the version of the levels file
 	settings_dict['easy_lives'] 		= 7
@@ -65,7 +66,7 @@ def load_defaults(settings_dict):
 	settings_dict['hard_lives'] 		= 3
 	settings_dict['percent_correct'] 	= 0.9 		#Percent of match with blank to give the answer to the player ##NOTE: Value must be > percent_close
 	settings_dict['percent_close'] 		= 0.7 		#Percent of match with blank to give player hint that they are close
-	settings_dict['close_forgiveness'] 	= True 		#Should player lose a life when close to getting the answer right
+	settings_dict['close_forgiveness'] 	= True 		#Should player lose a life when the percentage correct was between percent_close and percent_correct?
 	settings_dict['winner'] 			= False 	#Will be set to True to indicate the player won
 	settings_dict['current_level'] 		= 1			#Always initialize current_level to begin at level 1
 	settings_dict['level_complete'] 	= False
@@ -80,7 +81,7 @@ def set_lives(settings):
 		if settings['difficulty'] == 'h': settings['lives'] = settings['hard_lives']
 	return True #Always return true, otherwise if there is an error it should cause an exception
 
-#Returns levels dictionary if successful, otherwise returns false
+#Returns levels dictionary if successful, otherwise returns an empty dictionary
 def load_level(settings,levels_dict,filename):
 	try:
 		levels_file = open(filename, "r")
@@ -90,20 +91,19 @@ def load_level(settings,levels_dict,filename):
 			print 'Found levels file, but it is not the correct version. Please try another file.'
 			x = raw_input('Press [enter] to continue')
 			os.system('cls')
-			return False
+			return {}
 	except IOError:
-		return False
+		return {}
 
 # Allows user to select a level
-# Takes settings dictionary from main function
-# Since dictionary is mutable, nothing is returned back, the dictionary is simply updated
+# requires settings dictionary and levels dictionary, returns levels dictionary
 def level_select(settings,levels_dict):
 	while True:
 		user_input = raw_input('Please enter the name of the levels file you would like to use.\nHint: Just hit enter to load the default level\n')
-		if user_input == '': user_input = 'udacity_example' 				#Sets default level if none is chosen
+		if user_input == '': user_input = 'default' 						# Sets default level if none is chosen
 		levels_dict = load_level(settings,levels_dict,user_input + ".yml") 	# Attempts to load the requested level, returns True on success
-		if not levels_dict:
-			print "Error loading level, please try again." #Loop will continue around, causing instructions to be canceled
+		if not levels_dict: 												#If the dictionary is empty
+			print "Error loading level, please try again." 					#Loop will continue around, causing instructions to be canceled
 			continue
 		else:
 			os.system('cls')
@@ -111,7 +111,9 @@ def level_select(settings,levels_dict):
 			settings['current_challenge'] = levels_dict['levels'][settings['current_level']]['challenge'] if not levels_dict['settings']['encoding'] else base64.b64decode(levels_dict['levels'][settings['current_level']]['challenge'])
 		return levels_dict
 
-# Allows user to select a difficulty)
+# Allows user to select a difficulty
+# Does not require a return value, as settings is a dictionary and it is mutable
+# so we are updating the settings dictionary from this function
 def difficulty_select(settings):
 	while True: #put into while loop so that the question is retried upon entering an incorrect difficulty
 		user_input = raw_input("Please select your difficulty. ([e]asy, [m]edium, [h]ard, [c]ustom)\n")
@@ -129,6 +131,10 @@ def difficulty_select(settings):
 				set_lives(settings)
 			break #Break the loop to prevent infinite loop
 
+# Takes settings dict, levels dict, and the user's guess
+# Returns a string of either 'correct', 'incorrect', or 'close' depending on the percentage
+# of guess matches any of the available answers. The percentage required for close is set
+# in default_settings()
 def validate_guess(settings,levels_dict,guess):
 	result = 'incorrect' #By initializing this variable to incorrect, we are assuming an incorrect response if we don't get a "close" or "correct" result
 	for answer in levels_dict['levels'][settings['current_level']]['answers']:
@@ -146,8 +152,14 @@ def validate_guess(settings,levels_dict,guess):
 			break # break loop to prevent a correct response from being overridden by a close response
 	return result
 
-
-def play_game(settings,levels_dict):
+# This is function takes the settings dictionary and the levels dictionary as input.
+# It displays the current challenge question, remaining lives, and takes the user's guess.
+# The function then takes the appropriate steps based on if the player got the answer correct,
+# was close, or incorrect. It reduces the lives when appropriate and advanced the level to the
+# next level when appropriate. Finally, it takes the appropriate steps to indicate if the player
+# won or lost the game.
+# Does not return any output
+def play_level(settings,levels_dict):
 	os.system('cls')
 	print settings['current_challenge'] + '\n'
 	guess = raw_input('Lives remaining: %s\nAnswer: ' % str(settings['lives'])).lower()
@@ -167,9 +179,14 @@ def play_game(settings,levels_dict):
 		raw_input('Not quite, Try again...\npress [enter] to continue')
 		settings['lives'] -= 1
 
-#Main function, requires no input, is ran upon execution of python file
+# Main function, requires no input and has no returned value.
+# is ran upon execution of python file.
+# Initializes variables, runs default settings, runs level select, then
+# runs the game within a loop until the game ends (based on lives going
+# below 0 or the user winning the game).
+# Finally, recursive function call to itself if user requests to play again
 def main():
-	settings = {}
+	settings = {} #initializing dictionaries
 	levels_dict = {}
 	os.system('cls') #clear the screen
 	settings = load_defaults(settings)
@@ -177,11 +194,11 @@ def main():
 	levels_dict = level_select(settings,levels_dict)
 	settings['encoded'] = levels_dict['settings']['encoding']
 	while settings['lives'] >= 0:
-		play_game(settings,levels_dict)
+		play_level(settings,levels_dict)
 		if settings['winner']:
 			os.system('cls')
 			play_again = raw_input('\n\n\nCongratulations!!! You are the Winrar! You win One FREE INTERNET!\n\n\nWould you like to play again? (y/[n])\n').lower()
-			break
+			break #Since a winner will have >= 0 remaining lives, break out of loop
 	if not settings['winner']:
 		os.system('cls')
 		play_again = raw_input('\n\n\nYou did your best... better luck next time :(\n\n\nWould you like to play again? (y/[n])\n').lower()
@@ -189,4 +206,4 @@ def main():
 
 if __name__ == '__main__': #Trigger main function if the game is not imported
 	main()
-
+	
