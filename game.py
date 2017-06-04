@@ -81,6 +81,10 @@ def set_lives(settings):
 		if settings['difficulty'] == 'h': settings['lives'] = settings['hard_lives']
 	return True #Always return true, otherwise if there is an error it should cause an exception
 
+#Simple function to allow clearing of screen regardless of operating system
+def clear_screen():
+	os.system('cls' if os.name == 'nt' else 'clear')
+
 #Returns levels dictionary if successful, otherwise returns an empty dictionary
 def load_level(settings,levels_dict,filename):
 	try:
@@ -90,7 +94,7 @@ def load_level(settings,levels_dict,filename):
 		else:
 			print 'Found levels file, but it is not the correct version. Please try another file.'
 			x = raw_input('Press [enter] to continue')
-			os.system('cls')
+			clear_screen()
 			return {}
 	except IOError:
 		return {}
@@ -106,7 +110,7 @@ def level_select(settings,levels_dict):
 			print "Error loading level, please try again." 					#Loop will continue around, causing instructions to be canceled
 			continue
 		else:
-			os.system('cls')
+			clear_screen()
 			print "Successfully loaded level %s" % user_input
 			settings['current_challenge'] = levels_dict['levels'][settings['current_level']]['challenge'] if not levels_dict['settings']['encoding'] else base64.b64decode(levels_dict['levels'][settings['current_level']]['challenge'])
 		return levels_dict
@@ -160,9 +164,9 @@ def validate_guess(settings,levels_dict,guess):
 # won or lost the game.
 # Does not return any output
 def play_level(settings,levels_dict):
-	os.system('cls')
+	clear_screen()
 	print settings['current_challenge'] + '\n'
-	guess = raw_input('Lives remaining: %s\nAnswer: ' % str(settings['lives'])).lower()
+	guess = raw_input('Lives remaining: %s\nMake a guess for any of the blanks: ' % str(settings['lives'])).lower()
 	result = validate_guess(settings,levels_dict,guess)
 	if result == 'correct':
 		raw_input("That's Correct!\npress [enter] to continue")
@@ -188,7 +192,7 @@ def play_level(settings,levels_dict):
 def main():
 	settings = {} #initializing dictionaries
 	levels_dict = {}
-	os.system('cls') #clear the screen
+	clear_screen()
 	settings = load_defaults(settings)
 	difficulty_select(settings)
 	levels_dict = level_select(settings,levels_dict)
@@ -196,14 +200,13 @@ def main():
 	while settings['lives'] >= 0:
 		play_level(settings,levels_dict)
 		if settings['winner']:
-			os.system('cls')
+			clear_screen()
 			play_again = raw_input('\n\n\nCongratulations!!! You are the Winrar! You win One FREE INTERNET!\n\n\nWould you like to play again? (y/[n])\n').lower()
 			break #Since a winner will have >= 0 remaining lives, break out of loop
 	if not settings['winner']:
-		os.system('cls')
+		clear_screen()
 		play_again = raw_input('\n\n\nYou did your best... better luck next time :(\n\n\nWould you like to play again? (y/[n])\n').lower()
 	if play_again == 'y': main()
 
 if __name__ == '__main__': #Trigger main function if the game is not imported
 	main()
-	
