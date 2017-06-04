@@ -1,9 +1,15 @@
-level_1:
-  1_challenge: QSBfXzFfXyBpcyBjcmVhdGVkIHdpdGggdGhlIGRlZiBrZXl3b3JkLiBZb3Ugc3BlY2lmeSB0aGUgaW5wdXRzIGEgX18xX18gdGFrZXMgYnkgYWRkaW5nIF9fMl9fIHNlcGFyYXRlZCBieSBjb21tYXMgYmV0d2VlbiB0aGUgcGFyZW50aGVzZXMuIF9fMV9fcyBieSBkZWZhdWx0IHJldHVybiBfXzNfXyBpZiB5b3UgZG9uJ3Qgc3BlY2lmeSB0aGUgdmFsdWUgdG8gcmV0dXJuLiBfXzJfXyBjYW4gYmUgc3RhbmRhcmQgZGF0YSB0eXBlcyBzdWNoIGFzIHN0cmluZywgbnVtYmVyLCBkaWN0aW9uYXJ5LCB0dXBsZSwgYW5kIF9fNF9fIG9yIGNhbiBiZSBtb3JlIGNvbXBsaWNhdGVkIHN1Y2ggYXMgb2JqZWN0cyBhbmQgbGFtYmRhIGZ1bmN0aW9ucy4g
-  2_answers:
-    '1': ZnVuY3Rpb24=
-    '2': dmFyaWFibGVz
-    '3': bm90aGluZw==
-    '4': c2V0
+levels:
+  1:
+    challenge: A ___1___ is created with the def keyword. You specify the inputs a
+      ___1___ takes by adding ___2___ separated by commas between the parentheses. ___1___s
+      by default return ___3___ if you don't specify the value to return. ___2___ can
+      be standard data types such as string, number, dictionary, tuple, and ___4___
+      or can be more complicated such as objects and lambda functions.
+    answers:
+      '1': function
+      '2': variables
+      '3': nothing
+      '4': set
 settings:
-  encoding: true
+  encoding: false
+  version: 1

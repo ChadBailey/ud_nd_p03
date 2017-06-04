@@ -1,5 +1,4 @@
 #
-
 # game.py made by Chad Bailey 4-15-2017
 #
 # Purpose: Udacity intro to Programming Nanodegree, 3rd project
@@ -51,149 +50,143 @@
 ### My Bonus Criteria ###
 # Abstract levels into a configuration file
 # Make configuration file not obvious to read/modify to discourage cheating
-# Make ascii graphic to represent tries/lives like hangman
-# Make cool ascii ending congratulations
 
 import yaml
 import os
 import base64
+import re
+from difflib import SequenceMatcher as SeqMat
 
-# Returns true if valid, false if invalid
-# Also prints out helpful text if a level was loaded, but not of the correct version - then returns false
-def level_validator(filename):
-	if os.path.isfile(filename):
-		try:
-			try:
-				levels_file = open(filename, "r")
-			except IOError:
-				return False
-			levels_dict = yaml.load(levels_file)
-			try:
-				if levels_dict['settings']['version'] == 1: return True
-			except KeyError: pass
+#All default settings go here
+def load_defaults(settings_dict):
+	settings_dict['game_version'] 		= 1 		#Version of the game - used to validate the version of the levels file
+	settings_dict['easy_lives'] 		= 7
+	settings_dict['medium_lives'] 		= 5
+	settings_dict['hard_lives'] 		= 3
+	settings_dict['percent_correct'] 	= 0.9 		#Percent of match with blank to give the answer to the player ##NOTE: Value must be > percent_close
+	settings_dict['percent_close'] 		= 0.7 		#Percent of match with blank to give player hint that they are close
+	settings_dict['close_forgiveness'] 	= True 		#Should player lose a life when close to getting the answer right
+	settings_dict['winner'] 			= False 	#Will be set to True to indicate the player won
+	settings_dict['current_level'] 		= 1			#Always initialize current_level to begin at level 1
+	settings_dict['level_complete'] 	= False
+	return settings_dict
+
+#Function for mapping user input to amount of lives available.
+#settings['difficulty'] is set in function difficulty_select()
+def set_lives(settings):
+	if not settings['difficulty'] == 'c': #Custom difficulties already have lives set in difficulty_select function
+		if settings['difficulty'] == 'e': settings['lives'] = settings['easy_lives']
+		if settings['difficulty'] == 'm': settings['lives'] = settings['medium_lives']
+		if settings['difficulty'] == 'h': settings['lives'] = settings['hard_lives']
+	return True #Always return true, otherwise if there is an error it should cause an exception
+
+#Returns levels dictionary if successful, otherwise returns false
+def load_level(settings,levels_dict,filename):
+	try:
+		levels_file = open(filename, "r")
+		levels_dict = yaml.load(levels_file)
+		if levels_dict['settings']['version'] >= settings['game_version']: return levels_dict
+		else:
 			print 'Found levels file, but it is not the correct version. Please try another file.'
 			x = raw_input('Press [enter] to continue')
 			os.system('cls')
 			return False
-
-		except IOError:
-			return False
-	return False
-
-# load_level returns true on success, false on failure
-def load_level(levels_dict,filename):
-	if level_validator(filename):
-		# otherwise, try and open the file for writing
-		try:
-			levels_file = open(filename, "r")
-		except IOError:
-			return False
-
-		levels_dict = yaml.load(levels_file)
-#		if levels_dict['settings']['encoding']:
-
-#		print levels_dict
-
-		return levels_dict
-
-	else:
+	except IOError:
 		return False
 
 # Allows user to select a level
 # Takes settings dictionary from main function
 # Since dictionary is mutable, nothing is returned back, the dictionary is simply updated
-def level_select(levels_dict):
-	#Level select
+def level_select(settings,levels_dict):
 	while True:
 		user_input = raw_input('Please enter the name of the levels file you would like to use.\nHint: Just hit enter to load the default level\n')
-
-		#Sets default level if none is chosen
-		if user_input == '': user_input = 'udacity_example'
-
-		# Attempts to load the requested level, returns True on success
-		levels_dict = load_level(levels_dict,user_input + ".yml")
+		if user_input == '': user_input = 'udacity_example' 				#Sets default level if none is chosen
+		levels_dict = load_level(settings,levels_dict,user_input + ".yml") 	# Attempts to load the requested level, returns True on success
 		if not levels_dict:
-			print "Error loading level, please try again."
+			print "Error loading level, please try again." #Loop will continue around, causing instructions to be canceled
+			continue
 		else:
 			os.system('cls')
 			print "Successfully loaded level %s" % user_input
-			return levels_dict
+			settings['current_challenge'] = levels_dict['levels'][settings['current_level']]['challenge'] if not levels_dict['settings']['encoding'] else base64.b64decode(levels_dict['levels'][settings['current_level']]['challenge'])
+		return levels_dict
 
 # Allows user to select a difficulty)
 def difficulty_select(settings):
-	while True:
+	while True: #put into while loop so that the question is retried upon entering an incorrect difficulty
 		user_input = raw_input("Please select your difficulty. ([e]asy, [m]edium, [h]ard, [c]ustom)\n")
-
 		if user_input.lower() in ['easy','e','medium','m','hard','h','custom','c']:
-			# only first letter stored, valid options are "e", "m", "h", and "c"
-			settings['difficulty'] = user_input.lower()[0]
+			settings['difficulty'] = user_input.lower()[0] # only first letter stored, valid options are "e", "m", "h", and "c"
 			if settings['difficulty'] == 'c':
-				user_input = raw_input("Custom mode selected, how many lives do you want to have? (enter number, or type [c]ancel to re-select game difficulty)\n")
+				user_input = raw_input("Custom mode selected, how many lives do you want to have? (enter number, or type [c]ancel to re-select game difficulty)\n").lower()
 				try:
 					user_input = int(user_input)
 					settings['lives'] = user_input
-				except ValueError:
-					continue
+					print 'Difficulty set! You will have %s lives. Lets get started!' % str(settings['lives'])
+				except ValueError: continue #Invalid input, retry
+			else:
+				settings['lives'] = settings['difficulty']
+				set_lives(settings)
+			break #Break the loop to prevent infinite loop
 
-			elif settings['difficulty'] == 'e': settings['lives'] = 10
-			elif settings['difficulty'] == 'm': settings['lives'] = 5
-			elif settings['difficulty'] == 'h': settings['lives'] = 3
+def validate_guess(settings,levels_dict,guess):
+	result = 'incorrect' #By initializing this variable to incorrect, we are assuming an incorrect response if we don't get a "close" or "correct" result
+	for answer in levels_dict['levels'][settings['current_level']]['answers']:
+		answer_text = levels_dict['levels'][settings['current_level']]['answers'][answer] if not settings['encoded'] else base64.b64decode(levels_dict['levels'][settings['current_level']]['answers'][answer]) #decode if encoded
+		percent_right = SeqMat(None, guess,answer_text).ratio()
+		if settings['percent_close'] <= percent_right < settings['percent_correct']:
+			result = 'close'
+		elif percent_right >= settings['percent_correct']: #If percentage correct is greater than the required percent correct
+			result = 'correct'
+			settings['current_challenge'] = re.sub("_{3}(" + answer + "){1}_{3}",answer_text,settings['current_challenge'])
+			del levels_dict['levels'][settings['current_level']]['answers'][answer] #Remove from dict
+			if len(levels_dict['levels'][settings['current_level']]['answers']) == 0:#Level Complete!
+				settings['level_complete'] = True
+				settings['current_level'] += 1
+			break # break loop to prevent a correct response from being overridden by a close response
+	return result
 
-			os.system('cls')
-			print 'Difficulty set! You will have %s lives. Lets get started!' % str(settings['lives'])
-			break
 
-def play_level(settings,level):
-	print settings
-	print 'Challenge: %s' % level['1_challenge']
-	print 'Answers: %s' % level['2_answers']
-	print 'Lives Left: %s' % str(settings['lives'])
-	user_input = raw_input("'[S]ave a life, [L]ose a life, [W]in?'\n")
-	user_input = user_input.lower()
-	if user_input != 's' and user_input != 'w':
-		os.system('cls')
-		print 'Life depleting.....'
-		settings['lives'] -= 1
-		return
-	elif user_input == 'w':
-		settings['winner'] = True
-		return
+def play_game(settings,levels_dict):
+	os.system('cls')
+	print settings['current_challenge'] + '\n'
+	guess = raw_input('Lives remaining: %s\nAnswer: ' % str(settings['lives'])).lower()
+	result = validate_guess(settings,levels_dict,guess)
+	if result == 'correct':
+		raw_input("That's Correct!\npress [enter] to continue")
+		if settings['level_complete']:
+			settings['level_complete'] = False
+			try: settings['current_challenge'] = levels_dict['levels'][settings['current_level']]['challenge'] if not settings['encoded'] else base64.b64decode(levels_dict['levels'][settings['current_level']]['challenge'])
+			except KeyError:
+				settings['winner'] = True
+				return
+	elif result == 'close':
+		raw_input("You're really close! Try again!\npress [enter] to continue")
+		if not settings['close_forgiveness']: settings['lives'] -= 1
 	else:
-		print 'Save successful!'
-		return
-	
+		raw_input('Not quite, Try again...\npress [enter] to continue')
+		settings['lives'] -= 1
 
+#Main function, requires no input, is ran upon execution of python file
 def main():
-
-	os.system('cls') #clear the screen
-
-	#Initialize and populate settings dictionary
 	settings = {}
-	settings['winner'] = False # Will be set to True to indicate they have won!
-	settings['win_level'] = False
 	levels_dict = {}
-
+	os.system('cls') #clear the screen
+	settings = load_defaults(settings)
 	difficulty_select(settings)
-
-	levels_dict = level_select(levels_dict)
-
+	levels_dict = level_select(settings,levels_dict)
 	settings['encoded'] = levels_dict['settings']['encoding']
-
 	while settings['lives'] >= 0:
-
-		for key in levels_dict:
-			if "level_" in key:
-				play_level(settings,levels_dict[key])
-
+		play_game(settings,levels_dict)
 		if settings['winner']:
 			os.system('cls')
-			print '\n\n\nCongratulations!!! You are the Winrar! You win One FREE INTERNET!\n\n\n'
+			play_again = raw_input('\n\n\nCongratulations!!! You are the Winrar! You win One FREE INTERNET!\n\n\nWould you like to play again? (y/n)\n').lower()
+			if play_again == 'y': main()
 			break
-
 	if not settings['winner']:
 		os.system('cls')
-		print '\n\n\nSomething very unfortunate has happened... better luck next time :(\n\n\n'
+		print '\n\n\nYou did your best... better luck next time :(\n\n\n'
 
-if __name__ == '__main__':
+if __name__ == '__main__': #Trigger main function if the game is not imported
 	main()
 
